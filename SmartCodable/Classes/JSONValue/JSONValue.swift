@@ -114,7 +114,7 @@ private extension JSONValue {
             return NSNumber(value: bool)
         case .number(let string):
             guard let number = NSNumber.fromJSONNumber(string) else {
-                throw JSONError.numberIsNotRepresentableInSwift(parsed: string)
+                throw JSONParserError.numberIsNotRepresentableInSwift(parsed: string)
             }
             return number
         case .null:
@@ -173,7 +173,7 @@ extension NSNumber {
         return nil
     }
 }
-enum JSONError: Swift.Error, Equatable {
+enum JSONParserError: Swift.Error, Equatable {
     case cannotConvertInputDataToUTF8
     case unexpectedCharacter(ascii: UInt8, characterIndex: Int)
     case unexpectedEndOfFile
