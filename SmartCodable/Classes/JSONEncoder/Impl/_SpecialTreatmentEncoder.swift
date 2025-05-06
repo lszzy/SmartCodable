@@ -169,17 +169,12 @@ extension _SpecialTreatmentEncoder {
     internal func _converted(_ key: CodingKey) -> CodingKey {
         
         var newKey = key
-        
-        var useMappedKeys = false
-        if let key = CodingUserInfoKey.useMappedKeys {
-            useMappedKeys = impl.userInfo[key] as? Bool ?? false
-        }
             
         if let objectType = impl.cache.topSnapshot?.objectType {
             if let mappings = objectType.mappingForKey() {
                 for mapping in mappings {
                     if mapping.to.stringValue == newKey.stringValue {
-                        if useMappedKeys, let first = mapping.from.first {
+                        if let first = mapping.from.first {
                             newKey = _JSONKey.init(stringValue: first, intValue: nil)
                         } else {
                             newKey = mapping.to

@@ -99,8 +99,8 @@ extension SmartEncodable {
     ///   let dict1 = model.toDictionary() // ["data": "value"]
     ///   let dict2 = model.toDictionary(useMappedKeys: true) // ["json_data": "value"]
     ///   ```
-    public func toDictionary(useMappedKeys: Bool = false, options: Set<SmartEncodingOption>? = nil) -> [String: Any]? {
-        return _transformToJson(self, type: Self.self, useMappedKeys: useMappedKeys, options: options)
+    public func toDictionary(options: Set<SmartEncodingOption>? = nil) -> [String: Any]? {
+        return _transformToJson(self, type: Self.self, options: options)
     }
     
     /// Serializes into a JSON string
@@ -108,8 +108,8 @@ extension SmartEncodable {
     /// - Parameter options: encoding options
     /// - Parameter prettyPrint: Whether to format print (adds line breaks in the JSON)
     /// - Returns: JSON string
-    public func toJSONString(useMappedKeys: Bool = false, options: Set<SmartEncodingOption>? = nil, prettyPrint: Bool = false) -> String? {
-        if let anyObject = toDictionary(useMappedKeys: useMappedKeys, options: options) {
+    public func toJSONString(options: Set<SmartEncodingOption>? = nil, prettyPrint: Bool = false) -> String? {
+        if let anyObject = toDictionary(options: options) {
             return _transformToJsonString(object: anyObject, prettyPrint: prettyPrint, type: Self.self)
         }
         return nil
@@ -121,8 +121,8 @@ extension Array where Element: SmartEncodable {
     /// Serializes into a array
     /// - Parameter useMappedKeys: Whether to use the mapped key during encoding. The default value is false.
     /// - Returns: array
-    public func toArray(useMappedKeys: Bool = false, options: Set<SmartEncodingOption>? = nil) -> [Any]? {
-        return _transformToJson(self,type: Element.self, useMappedKeys: useMappedKeys, options: options)
+    public func toArray(options: Set<SmartEncodingOption>? = nil) -> [Any]? {
+        return _transformToJson(self,type: Element.self, options: options)
     }
     
     /// Serializes into a JSON string
@@ -130,8 +130,8 @@ extension Array where Element: SmartEncodable {
     /// - Parameter options: encoding options
     /// - Parameter prettyPrint: Whether to format print (adds line breaks in the JSON)
     /// - Returns: JSON string
-    public func toJSONString(useMappedKeys: Bool = false, options: Set<SmartEncodingOption>? = nil, prettyPrint: Bool = false) -> String? {
-        if let anyObject = toArray(useMappedKeys: useMappedKeys, options: options) {
+    public func toJSONString(options: Set<SmartEncodingOption>? = nil, prettyPrint: Bool = false) -> String? {
+        if let anyObject = toArray(options: options) {
             return _transformToJsonString(object: anyObject, prettyPrint: prettyPrint, type: Element.self)
         }
         return nil
@@ -140,17 +140,11 @@ extension Array where Element: SmartEncodable {
 
 
 
-fileprivate func _transformToJson<T>(_ some: Encodable, type: Any.Type, useMappedKeys: Bool, options: Set<SmartEncodingOption>? = nil) -> T? {
+fileprivate func _transformToJson<T>(_ some: Encodable, type: Any.Type, options: Set<SmartEncodingOption>? = nil) -> T? {
     
     let jsonEncoder = SmartJSONEncoder()
     
-    if useMappedKeys, let key = CodingUserInfoKey.useMappedKeys {
-        var userInfo = jsonEncoder.userInfo
-        userInfo.updateValue(true, forKey: key)
-        jsonEncoder.userInfo = userInfo
-    }
-    
-    if let _options = options {
+    if let _options = options ?? SmartModelConfiguration.shared.encodingOptions {
         for _option in _options {
             switch _option {
             case .data(let strategy):

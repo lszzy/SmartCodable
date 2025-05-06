@@ -275,7 +275,7 @@ extension Data {
     fileprivate func createDecoder<T>(type: T.Type, options: Set<SmartDecodingOption>? = nil) -> JSONDecoder {
         let _decoder = SmartJSONDecoder()
         
-        if let _options = options {
+        if let _options = options ?? SmartModelConfiguration.shared.decodingOptions {
             for _option in _options {
                 switch _option {
                 case .data(let strategy):
@@ -436,22 +436,31 @@ fileprivate func getInnerData(inside value: Any?, by designatedPath: String?) ->
     }
     
     func getInnerObject(inside object: Any?, by designatedPath: String?) -> Any? {
-        
         var result: Any? = object
         var abort = false
         if let paths = designatedPath?.components(separatedBy: "."), paths.count > 0 {
-            var next = object as? [String: Any]
-            paths.forEach({ (seg) in
+            var next = object
+            for seg in paths {
                 if seg.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines) == "" || abort {
-                    return
+                    continue
                 }
-                if let _next = next?[seg] {
-                    result = _next
-                    next = _next as? [String: Any]
+                if let index = Int(seg), index >= 0 {
+                    if let array = next as? [Any], index < array.count {
+                        let _next = array[index]
+                        result = _next
+                        next = _next
+                    } else {
+                        abort = true
+                    }
                 } else {
-                    abort = true
+                    if let _next = (next as? [String: Any])?[seg] {
+                        result = _next
+                        next = _next
+                    } else {
+                        abort = true
+                    }
                 }
-            })
+            }
         }
         return abort ? nil : result
     }
