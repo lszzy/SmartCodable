@@ -19,7 +19,6 @@ import Combine
  - Maintains Codable compatibility for serialization
  */
 @propertyWrapper
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
 public struct SmartPublished<Value: Codable>: Codable {
     
     public init(from decoder: Decoder) throws {
@@ -107,7 +106,6 @@ public struct SmartPublished<Value: Codable>: Codable {
     }
 }
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
 extension SmartPublished: PostDecodingHookable {
     /// Handles post-mapping lifecycle events for wrapped values
     func wrappedValueDidFinishMapping() -> SmartPublished<Value>? {
@@ -120,7 +118,6 @@ extension SmartPublished: PostDecodingHookable {
 }
 
 
-@available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
 extension SmartPublished: PropertyWrapperInitializable {
     /// Creates an instance from any value if possible
     public static func createInstance(with value: Any) -> SmartPublished? {

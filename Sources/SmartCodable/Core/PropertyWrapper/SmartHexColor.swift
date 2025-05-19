@@ -20,23 +20,15 @@
  * ```
  */
 
-#if os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
 import UIKit
-public typealias ColorObject = UIColor
-#elseif os(macOS)
-import AppKit
-public typealias ColorObject = NSColor
-#endif
-
-
 
 @propertyWrapper
 public struct SmartHexColor: Codable {
-    public var wrappedValue: ColorObject?
+    public var wrappedValue: UIColor?
     
     private var encodeHexFormat: HexFormat?
 
-    public init(wrappedValue: ColorObject?, encodeHexFormat: HexFormat? = nil) {
+    public init(wrappedValue: UIColor?, encodeHexFormat: HexFormat? = nil) {
         self.wrappedValue = wrappedValue
         self.encodeHexFormat = encodeHexFormat
     }
@@ -89,7 +81,7 @@ public struct SmartHexColor: Codable {
 
 extension SmartHexColor {
     
-    public static func toColor(from hex: String, format: SmartHexColor.HexFormat) -> ColorObject? {
+    public static func toColor(from hex: String, format: SmartHexColor.HexFormat) -> UIColor? {
         // 1. 移除前缀
         let hexString = normalizedHexString(from: hex, prefix: format.prefix)
         
@@ -129,11 +121,7 @@ extension SmartHexColor {
             a = component(hexValue, shift: 0, mask: 0xFF)
         }
         
-#if os(macOS)
-        return NSColor(calibratedRed: r, green: g, blue: b, alpha: a)
-#else
         return UIColor(red: r, green: g, blue: b, alpha: a)
-#endif
     }
     
     /// 移除前缀并转小写
@@ -148,7 +136,7 @@ extension SmartHexColor {
     }
 
     
-    static func toHexString(from color: ColorObject, format: SmartHexColor.HexFormat) -> String? {
+    static func toHexString(from color: UIColor, format: SmartHexColor.HexFormat) -> String? {
         guard let components = color.rgbaComponents else { return nil }
 
         func clamped255(_ value: CGFloat) -> Int {
@@ -277,15 +265,10 @@ extension SmartHexColor {
 
 
 
-private extension ColorObject {
+private extension UIColor {
     var rgbaComponents: (r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat)? {
-#if os(macOS)
-        guard let converted = usingColorSpace(.deviceRGB) else { return nil }
-        return (converted.redComponent, converted.greenComponent, converted.blueComponent, converted.alphaComponent)
-#else
         var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
         guard getRed(&r, green: &g, blue: &b, alpha: &a) else { return nil }
         return (r, g, b, a)
-#endif
     }
 }

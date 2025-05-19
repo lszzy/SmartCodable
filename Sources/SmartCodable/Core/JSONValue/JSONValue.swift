@@ -237,7 +237,7 @@ extension JSONValue {
                 }
                 bytes.append(._closebracket)
             case .object(let dict):
-                if #available(macOS 10.13, *), options.contains(.sortedKeys) {
+                if options.contains(.sortedKeys) {
                     let sorted = dict.sorted { $0.key.compare($1.key, options: [.caseInsensitive, .diacriticInsensitive, .forcedOrdering, .numeric, .widthInsensitive]) == .orderedAscending }
                     self.writeObject(sorted, into: &bytes)
                 } else {
@@ -299,7 +299,7 @@ extension JSONValue {
                 self.addInset(to: &bytes, depth: depth)
                 bytes.append(._closebracket)
             case .object(let dict):
-                if #available(macOS 10.13, *), options.contains(.sortedKeys) {
+                if options.contains(.sortedKeys) {
                     let sorted = dict.sorted { $0.key.compare($1.key, options: [.caseInsensitive, .diacriticInsensitive, .forcedOrdering, .numeric, .widthInsensitive]) == .orderedAscending }
                     self.writePrettyObject(sorted, into: &bytes, depth: depth)
                 } else {
@@ -389,7 +389,7 @@ extension JSONValue {
                     nextIndex = stringBytes.index(after: nextIndex)
                     startCopyIndex = nextIndex
                 case UInt8(ascii: "/"):
-                    if #available(macOS 10.15, iOS 13.0, watchOS 6.0, tvOS 13.0, *), options.contains(.withoutEscapingSlashes) == false {
+                    if options.contains(.withoutEscapingSlashes) == false {
                         bytes.append(contentsOf: stringBytes[startCopyIndex ..< nextIndex])
                         bytes.append(contentsOf: [._backslash, UInt8(ascii: "/")])
                         nextIndex = stringBytes.index(after: nextIndex)
