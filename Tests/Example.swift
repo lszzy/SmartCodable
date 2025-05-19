@@ -2,8 +2,6 @@ import XCTest
 @testable import SmartCodable
 
 
-
-
 class Tests: XCTestCase {
     
     override func setUp() {
@@ -48,4 +46,5 @@ struct Smart: SmartCodable {
         case women = 0
     }
 }
+
 
